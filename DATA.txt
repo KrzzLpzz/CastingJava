@@ -1,0 +1,4 @@
+Cristian,Lopez,22,1.70
+Samuel,Villatoro,22,1.70
+Alicia,Lopez,24,1.56
+test,test,18,1.80

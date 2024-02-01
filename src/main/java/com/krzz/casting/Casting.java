@@ -4,10 +4,19 @@
  */
 package com.krzz.casting;
 
-import java.awt.AWTException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -15,12 +24,18 @@ import javax.swing.JOptionPane;
  */
 public class Casting extends javax.swing.JFrame {
 
-    public static String mensaje;
+    private final String ruta = System.getProperties().getProperty("user.dir");
+    File archivo = new File(ruta + "//DATA.txt");
+
     /**
      * Creates new form Casting
      */
     public Casting() {
         initComponents();
+        loadFile(archivo, jTableData);
+        transferData();
+        jTxtNombre.addKeyListener(new MiKeyListener());
+        jTxtApellido.addKeyListener(new MiKeyListener());
     }
 
     /**
@@ -42,13 +57,16 @@ public class Casting extends javax.swing.JFrame {
         jTxtEdad = new javax.swing.JTextField();
         jTxtAltura = new javax.swing.JTextField();
         jBtnIngresar = new javax.swing.JButton();
+        jBtnNuevo = new javax.swing.JButton();
+        jBtnSalir = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTAResultado = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jTableData = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Casting");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Introducir Datos"));
 
@@ -67,34 +85,50 @@ public class Casting extends javax.swing.JFrame {
             }
         });
 
+        jBtnNuevo.setText("Nuevo");
+        jBtnNuevo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnNuevoActionPerformed(evt);
+            }
+        });
+
+        jBtnSalir.setText("Salir");
+        jBtnSalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnSalirActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTxtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addGap(22, 22, 22)
                         .addComponent(jTxtEdad))
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTxtApellido))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
                         .addComponent(jTxtAltura))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                        .addComponent(jBtnIngresar)
+                        .addGap(18, 18, 18)
+                        .addComponent(jBtnNuevo)
+                        .addGap(18, 18, Short.MAX_VALUE)
+                        .addComponent(jBtnSalir))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTxtApellido)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jBtnIngresar)
-                .addGap(86, 86, 86))
+                        .addComponent(jTxtNombre)))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -116,7 +150,10 @@ public class Casting extends javax.swing.JFrame {
                     .addComponent(jLabel4)
                     .addComponent(jTxtAltura, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBtnIngresar)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jBtnSalir)
+                    .addComponent(jBtnNuevo)
+                    .addComponent(jBtnIngresar))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -144,7 +181,7 @@ public class Casting extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTableData.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -152,19 +189,27 @@ public class Casting extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Nombre", "Apellido", "Edad", "Altura"
             }
-        ));
-        jScrollPane2.setViewportView(jTable1);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, true, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane2.setViewportView(jTableData);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(45, Short.MAX_VALUE)
+                .addContainerGap(55, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(45, 45, 45))
+                .addGap(55, 55, 55))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -185,20 +230,38 @@ public class Casting extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnIngresarActionPerformed
-        Data();
+        readData();
+        
+        if (JOptionPane.showConfirmDialog(null, "¿Quieres guardar la información ingresada?", "Guardar", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            saveFile(archivo);
+            loadFile(archivo, jTableData);
+        }
     }//GEN-LAST:event_jBtnIngresarActionPerformed
 
-    private void Data() {
+    private void jBtnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnNuevoActionPerformed
+        jTxtNombre.setText("");
+        jTxtApellido.setText("");
+        jTxtEdad.setText("");
+        jTxtAltura.setText("");
+    }//GEN-LAST:event_jBtnNuevoActionPerformed
+
+    private void jBtnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSalirActionPerformed
+        if (JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Salir", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+    }//GEN-LAST:event_jBtnSalirActionPerformed
+
+    private void readData() {
         // Variables para almacenar los datos ingresados por el usuario
-String nombre, apellido;
-int edad;
-double altura;
+        String nombre, apellido;
+        int edad;
+        double altura;
 
-// Uso de Try-Catch para manejar posibles errores al intentar convertir los datos ingresados por el usuario
-
+        // Uso de Try-Catch para manejar posibles errores al intentar convertir los datos ingresados por el usuario
         try {
             // Obtener datos del usuario - Casting Implicito
             nombre = jTxtNombre.getText();
@@ -224,7 +287,52 @@ double altura;
             JOptionPane.showMessageDialog(null, "Error: Los datos ingresados no son válidos. Por favor, asegúrese de ingresar valores numéricos para la edad y la altura.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
+    public static void loadFile(File archivo, JTable jTableData) {
+        DefaultTableModel modelData = (DefaultTableModel) jTableData.getModel();
+
+        // Limpiar el contenido existente de las JTables
+        modelData.setRowCount(0);
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(","); // Ajusta el separador según tu archivo
+                modelData.addRow(data);
+            }
+        } catch (IOException e) {
+        }
+    }
+
+    private void saveFile(File archivo) {
+        try (FileWriter escritura = new FileWriter(archivo, true)) {
+            String nombre = jTxtNombre.getText();
+            String apellido = jTxtApellido.getText();
+            String edad = jTxtEdad.getText();
+            String altura = jTxtAltura.getText();
+
+            escritura.write(nombre + "," + apellido + "," + edad + "," + altura + "\n"); // Agrega un salto de línea
+        } catch (IOException e) {
+        }
+    }
+
+    private void transferData() {
+        jTableData.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent Mouse_evt) {
+                JTable table = (JTable) Mouse_evt.getSource();
+                Point point = Mouse_evt.getPoint();
+                int row = table.rowAtPoint(point);
+                if (Mouse_evt.getClickCount() == 1) {
+                    jTxtNombre.setText(jTableData.getValueAt(jTableData.getSelectedRow(), 0).toString());
+                    jTxtApellido.setText(jTableData.getValueAt(jTableData.getSelectedRow(), 1).toString());
+                    jTxtEdad.setText(jTableData.getValueAt(jTableData.getSelectedRow(), 2).toString());
+                    jTxtAltura.setText(jTableData.getValueAt(jTableData.getSelectedRow(), 3).toString());
+                }
+            }
+        });
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -233,8 +341,8 @@ double altura;
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-        */
-        
+         */
+
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -260,8 +368,24 @@ double altura;
         });
     }
 
+    public class MiKeyListener extends KeyAdapter {
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+            char caracter = e.getKeyChar();
+            // Validar si el caracter es una letra
+            if (!Character.isLetter(caracter) && caracter != ' ') {
+                // Consumir el evento para evitar que se ingrese el caracter
+                e.consume();
+            }
+        }
+
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnIngresar;
+    private javax.swing.JButton jBtnNuevo;
+    private javax.swing.JButton jBtnSalir;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -271,7 +395,7 @@ double altura;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTAResultado;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTableData;
     private javax.swing.JTextField jTxtAltura;
     private javax.swing.JTextField jTxtApellido;
     private javax.swing.JTextField jTxtEdad;
