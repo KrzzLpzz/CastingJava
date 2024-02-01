@@ -4,16 +4,8 @@
  */
 package com.krzz.casting;
 
-import java.awt.Point;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.event.*;
+import java.io.*;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -24,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Casting extends javax.swing.JFrame {
 
+    // variable para asignar la ruta de nuestro archivo de texto
     private final String ruta = System.getProperties().getProperty("user.dir");
     File archivo = new File(ruta + "//DATA.txt");
 
@@ -33,8 +26,10 @@ public class Casting extends javax.swing.JFrame {
     public Casting() {
         initComponents();
         loadFile(archivo, jTableData);
-        transferData();
-        jTxtNombre.addKeyListener(new MiKeyListener());
+        transferData(); // cargamos la funcion para seleccionar los datos de la tabla
+        
+// cargamos los textfields con la clase para filtrar el texto
+        jTxtNombre.addKeyListener(new MiKeyListener()); 
         jTxtApellido.addKeyListener(new MiKeyListener());
     }
 
@@ -233,15 +228,18 @@ public class Casting extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    // Boton para ingresar datos
     private void jBtnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnIngresarActionPerformed
-        readData();
+        readData(); // procesamos la informacion guardada
         
+        // Usamos un if con un ConfirmDialog para saber si el usuario desea guardar los datos
         if (JOptionPane.showConfirmDialog(null, "¿Quieres guardar la información ingresada?", "Guardar", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-            saveFile(archivo);
-            loadFile(archivo, jTableData);
+            saveFile(archivo); // guardamos los datos
+            loadFile(archivo, jTableData); // cargamos la tabla
         }
     }//GEN-LAST:event_jBtnIngresarActionPerformed
 
+    // Boton para limpiar
     private void jBtnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnNuevoActionPerformed
         jTxtNombre.setText("");
         jTxtApellido.setText("");
@@ -249,12 +247,15 @@ public class Casting extends javax.swing.JFrame {
         jTxtAltura.setText("");
     }//GEN-LAST:event_jBtnNuevoActionPerformed
 
+    // Boton para salir
     private void jBtnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnSalirActionPerformed
+        // Primero muestra un ConfirmDialog que si quiere salir del programa
         if (JOptionPane.showConfirmDialog(null, "¿Seguro que quieres salir?", "Salir", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            System.exit(0);
+            System.exit(0); // si la respuesta es si, cierra el programa
         }
     }//GEN-LAST:event_jBtnSalirActionPerformed
 
+    // Funcion para leer los datos y mostrarlos
     private void readData() {
         // Variables para almacenar los datos ingresados por el usuario
         String nombre, apellido;
@@ -266,8 +267,8 @@ public class Casting extends javax.swing.JFrame {
             // Obtener datos del usuario - Casting Implicito
             nombre = jTxtNombre.getText();
             apellido = jTxtApellido.getText();
-            edad = Integer.parseInt(jTxtEdad.getText());
-            altura = Double.parseDouble(jTxtAltura.getText());
+            edad = Integer.parseInt(jTxtEdad.getText()); // convierte el texto del jtextfield a int
+            altura = Double.parseDouble(jTxtAltura.getText()); // convierte el texto del jtextfield a double
 
             // Operaciones con los datos
             // Concatenacion
@@ -282,47 +283,55 @@ public class Casting extends javax.swing.JFrame {
             jTAResultado.setText("Nombre Completo: " + nombreCompleto + " (Tipo: " + nombreCompleto.getClass().getName() + ")\n"
                     + "Año de Nacimiento Aproximado: " + añoNacimiento + " (Tipo: " + Integer.TYPE.getName() + ")\n"
                     + "Altura en Centímetros: " + alturaEnCm + " (Tipo: " + Double.TYPE.getName() + ")");
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             // Mostrar mensaje de error si los datos ingresados no son válidos
             JOptionPane.showMessageDialog(null, "Error: Los datos ingresados no son válidos. Por favor, asegúrese de ingresar valores numéricos para la edad y la altura.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    // Funcion para cargar el archivo txt en el jtable
     public static void loadFile(File archivo, JTable jTableData) {
+        // Obtenemos el modelo de la tabal de los Datos
         DefaultTableModel modelData = (DefaultTableModel) jTableData.getModel();
 
         // Limpiar el contenido existente de las JTables
         modelData.setRowCount(0);
 
+        // try-catch para leer el archivo
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-            String line;
+            String line; // string para guardar las lineas del archivo
             while ((line = br.readLine()) != null) {
-                String[] data = line.split(","); // Ajusta el separador según tu archivo
+                String[] data = line.split(","); // Usamos , para separar que dato va en cada columna
                 modelData.addRow(data);
             }
         } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error leyendo el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
         }
     }
 
+    // Funcion para guardar los datos en el archivo
     private void saveFile(File archivo) {
+        // try-catch para poder guardar los datos en el archivo de texto 
         try (FileWriter escritura = new FileWriter(archivo, true)) {
+            // obtiene los datos y los almacena en una variable
             String nombre = jTxtNombre.getText();
             String apellido = jTxtApellido.getText();
             String edad = jTxtEdad.getText();
             String altura = jTxtAltura.getText();
 
+            // concatena y guarda los campos
             escritura.write(nombre + "," + apellido + "," + edad + "," + altura + "\n"); // Agrega un salto de línea
         } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al guardar el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    // Funcion para transferir la informacion del jtable a los textfields
     private void transferData() {
         jTableData.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent Mouse_evt) {
-                JTable table = (JTable) Mouse_evt.getSource();
-                Point point = Mouse_evt.getPoint();
-                int row = table.rowAtPoint(point);
+                // si damos clic en una de las lineas le pasa el valor de cada columna a los textfields
                 if (Mouse_evt.getClickCount() == 1) {
                     jTxtNombre.setText(jTableData.getValueAt(jTableData.getSelectedRow(), 0).toString());
                     jTxtApellido.setText(jTableData.getValueAt(jTableData.getSelectedRow(), 1).toString());
@@ -350,24 +359,17 @@ public class Casting extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Casting.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Casting.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Casting.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Casting.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Casting().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new Casting().setVisible(true);
         });
     }
 
+    // Clase que nos ayuda a filtrar nuestros textfields, para que no se ingresen numeros
     public class MiKeyListener extends KeyAdapter {
 
         @Override
