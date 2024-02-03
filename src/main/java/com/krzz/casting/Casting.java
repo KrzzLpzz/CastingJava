@@ -231,12 +231,6 @@ public class Casting extends javax.swing.JFrame {
     // Boton para ingresar datos
     private void jBtnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnIngresarActionPerformed
         readData(); // procesamos la informacion guardada
-        
-        // Usamos un if con un ConfirmDialog para saber si el usuario desea guardar los datos
-        if (JOptionPane.showConfirmDialog(null, "¿Quieres guardar la información ingresada?", "Guardar", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-            saveFile(archivo); // guardamos los datos
-            loadFile(archivo, jTableData); // cargamos la tabla
-        }
     }//GEN-LAST:event_jBtnIngresarActionPerformed
 
     // Boton para limpiar
@@ -283,6 +277,12 @@ public class Casting extends javax.swing.JFrame {
             jTAResultado.setText("Nombre Completo: " + nombreCompleto + " (Tipo: " + nombreCompleto.getClass().getName() + ")\n"
                     + "Año de Nacimiento Aproximado: " + añoNacimiento + " (Tipo: " + Integer.TYPE.getName() + ")\n"
                     + "Altura en Centímetros: " + alturaEnCm + " (Tipo: " + Double.TYPE.getName() + ")");
+            
+            // Usamos un if con un ConfirmDialog para saber si el usuario desea guardar los datos
+            if (JOptionPane.showConfirmDialog(null, "¿Quieres guardar la información ingresada?", "Guardar", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                saveFile(archivo); // guardamos los datos
+                loadFile(archivo, jTableData); // cargamos la tabla
+            }
         } catch (NumberFormatException e) {
             // Mostrar mensaje de error si los datos ingresados no son válidos
             JOptionPane.showMessageDialog(null, "Error: Los datos ingresados no son válidos. Por favor, asegúrese de ingresar valores numéricos para la edad y la altura.", "Error de Entrada", JOptionPane.ERROR_MESSAGE);
@@ -381,7 +381,6 @@ public class Casting extends javax.swing.JFrame {
                 e.consume();
             }
         }
-
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
